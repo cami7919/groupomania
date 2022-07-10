@@ -5,9 +5,9 @@ const fs = require('fs');
 
 // -------------fonctions du CRUD -----------------------------------
 exports.createPublication = (req, res, next) => {     
-      const publicationObject = JSON.parse(req.body.publication);
+    //   const publicationObject = JSON.parse(req.body.publication);
       
-      //const publicationObject = req.body.publication;
+      const publicationObject = req.body.publication;
      console.log("publicationObjet :" + publicationObject);
 
     // delete publicationObject._id;
@@ -135,4 +135,35 @@ exports.likePublication = (req, res, next) => {
             }
         })
         .catch(error => res.status(500).json({ error }))
+}
+
+//gestion des commentaires
+
+module.exports.commentPub =(req,res, next)=>{
+    Publication.findOne({ _id: req.params.id })
+    .then(publication => {
+        Publication.updateOne({ _id: req.params.id }, {
+            $inc: { likes: 1 },
+            $push: { comments: {
+                    commenterId: req.body.commenterId,
+                    text: req.body.test,
+                    timestamp: new Date().getTime()},
+        }
+        .then(() => res.status(201).json({ message: 'commentaire posté ! !' }))
+        .catch(error => res.status(400).json({ error }))
+    
+})})
+    .catch(error => res.status(500).json({ error }))
+}
+
+
+
+module.exports.editCommentPub =(req,res, next)=>{
+
+    
+}
+
+module.exports.deleteCommentPub =(req,res, next)=>{
+
+    
 }

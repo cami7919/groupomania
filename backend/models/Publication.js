@@ -8,8 +8,15 @@ const publicationSchema = mongoose.Schema({
     imageUrl: { type: String },
     likes: { type: Number, default: 0 },
     //   dislikes: { type: Number, default:0 },
-    usersLiked: { type: [String] }//tableaux des id des users
+    usersLiked: { type: [String] },//tableaux des id des users
     //   usersDisliked: { type: [String] },
+    comments:{
+        type:[{
+            commenterId:String,
+            text:String,
+            timestamp: Number
+        }]
+    }
 },
     {
         timestamps: true
