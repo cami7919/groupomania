@@ -91,11 +91,13 @@ exports.getOnePublication = (req, res, next) => {
         .catch(error => res.status(404).json({ error }));
 };
 
-
+//verifier si "sort" est bien placé :
 exports.getAllPublications = (req, res, next) => {
     Publication.find()
-        .then(publications => res.status(200).json(publications))
+        .then(publications => res.status(200).json(publications)).sort({createdAt:-1})
         .catch(error => res.status(400).json({ error }));
+
+        
 };
 
 
@@ -142,11 +144,10 @@ exports.likePublication = (req, res, next) => {
 module.exports.commentPub =(req,res, next)=>{
     Publication.findOne({ _id: req.params.id })
     .then(publication => {
-        Publication.updateOne({ _id: req.params.id }, {
-            $inc: { likes: 1 },
+        Publication.updateOne({ _id: req.params.id }, {            
             $push: { comments: {
                     commenterId: req.body.commenterId,
-                    text: req.body.test,
+                    text: req.body.text,
                     timestamp: new Date().getTime()},
         }
         .then(() => res.status(201).json({ message: 'commentaire posté ! !' }))
@@ -158,12 +159,17 @@ module.exports.commentPub =(req,res, next)=>{
 
 
 
-module.exports.editCommentPub =(req,res, next)=>{
+// module.exports.editCommentPub =(req,res, next)=>{
+//     Publication.findOne({ _id: req.params.id })
+//     .then(publication => {
+//         Publication.updateOne({ _id: req.params.id }, { 
 
     
-}
+// }
 
-module.exports.deleteCommentPub =(req,res, next)=>{
-
+// module.exports.deleteCommentPub =(req,res, next)=>{
+//     Publication.findOne({ _id: req.params.id })
+//     .then(publication => {
+//         Publication.updateOne({ _id: req.params.id }, { 
     
-}
+// }
