@@ -43,7 +43,7 @@ exports.createPublication = (req, res, next) => {
 // };
 
 
-
+//ajouter le unlink pour supprimer la photo si modifiée : où placer le unlink ?
 exports.modifyPublication = (req, res, next) => {
     const publicationObject = req.file ?
         {
@@ -56,32 +56,30 @@ exports.modifyPublication = (req, res, next) => {
 };
 
 
-exports.removePublication = (req, res, next) => {
-
-
-    Publication.deleteOne({ _id: req.params.id })
-        .then(() => res.status(200).json({ message: 'Publication supprimée !' }))
-        .catch(error => res.status(400).json({ error }));
-};
+// exports.removePublication = (req, res, next) => {
+//     Publication.deleteOne({ _id: req.params.id })
+//         .then(() => res.status(200).json({ message: 'Publication supprimée !' }))
+//         .catch(error => res.status(400).json({ error }));
+// };
 
 
 
 
 
-// exports.removePublication = (req, res, next) => { 
-// // On récupère la publication dans la BDD - grâce à l'id de l'objet, passé dans l'url:   
-//     Publication.findOne({ _id: req.params.id })
-//           .then(publication => {
-//             const filename = publication.imageUrl.split('/images/')[1];
-//             fs.unlink(`images/${filename}`, () => {
-//             Publication.deleteOne({ _id: req.params.id })
-//                 .then(() => res.status(200).json({ message: 'Publication supprimée !'}))
-//                 .catch(error => res.status(400).json({ error }));
-//             });
-//           })
-//           .catch(error => { console.log(error); res.status(00).json({ error }) });
-//         //   .catch(error => res.status(500).json({ error }));
-//       };
+exports.removePublication = (req, res, next) => { 
+// On récupère la publication dans la BDD - grâce à l'id de l'objet, passé dans l'url:   
+    Publication.findOne({ _id: req.params.id })
+          .then(publication => {
+            const filename = publication.imageUrl.split('/images/')[1];
+            fs.unlink(`images/${filename}`, () => {
+            Publication.deleteOne({ _id: req.params.id })
+                .then(() => res.status(200).json({ message: 'Publication supprimée !'}))
+                .catch(error => res.status(400).json({ error }));
+            });
+          })
+          .catch(error => { console.log(error); res.status(00).json({ error }) });
+        //   .catch(error => res.status(500).json({ error }));
+      };
 
 
 

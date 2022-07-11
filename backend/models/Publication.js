@@ -16,7 +16,7 @@ const publicationSchema = mongoose.Schema({
             text:String,
             timestamp: Number
         }]
-    }
+        }
 },
     {
         timestamps: true

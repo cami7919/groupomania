@@ -48,9 +48,10 @@ app.use(helmet());
 // Pour acceder aux images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-//Routes utilisateur et publications
+//Routes utilisateur , publications et authentification
  app.use ('/api/publications', publicationRoutes);
  app.use('/api/auth', userRoutes);
+ 
 
 
 
