@@ -2,25 +2,22 @@
 const req = require('express/lib/request');
 const Publication = require('../models/Publication');
 const fs = require('fs');
+const ObjectID = require("mongoose").Types.ObjectId;
 
 // -------------fonctions du CRUD -----------------------------------
 exports.createPublication = (req, res, next) => {     
-    //   const publicationObject = JSON.parse(req.body.publication);
-      
+    //   const publicationObject = JSON.parse(req.body.publication);      
       const publicationObject = req.body.publication;
-     console.log("publicationObjet :" + publicationObject);
-
+    // jj console.log("publicationObjet :" + publicationObject);
     // delete publicationObject._id;
     // delete publicationObject._userId;
-
     const publication = new Publication({
         ...publicationObject
         // userId:req.auth.userId,
         //  imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
      });
 
-    console.log("contenu de new Publication :" + publication);
-
+    // console.log("contenu de new Publication :" + publication);
     publication.save()
         .then(() => res.status(201).json({ message: 'Publication enregistrée !' }))
         .catch(error => { console.log(error); res.status(400).json({ error }) });
@@ -45,11 +42,11 @@ exports.createPublication = (req, res, next) => {
 
 //ajouter le unlink pour supprimer la photo si modifiée : où placer le unlink ?
 exports.modifyPublication = (req, res, next) => {
-    const publicationObject = req.file ?
+    const publicationObject = req.file ?  //c'est un ternaire : si la req comporte un file,
         {
-            ...JSON.parse(req.body.publication),
+            ...JSON.parse(req.body.publication),  //alors  : fais la 1ere action decrite ici ; 
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        } : { ...req.body };
+        } : { ...req.body };                     // sinon fais la 2eme decrite ici (à gauche)
     Publication.updateOne({ _id: req.params.id }, { ...publicationObject, _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Publication modifiée !' }))
         .catch(error => res.status(400).json({ error }));
@@ -63,9 +60,6 @@ exports.modifyPublication = (req, res, next) => {
 // };
 
 
-
-
-
 exports.removePublication = (req, res, next) => { 
 // On récupère la publication dans la BDD - grâce à l'id de l'objet, passé dans l'url:   
     Publication.findOne({ _id: req.params.id })
@@ -77,7 +71,7 @@ exports.removePublication = (req, res, next) => {
                 .catch(error => res.status(400).json({ error }));
             });
           })
-          .catch(error => { console.log(error); res.status(00).json({ error }) });
+          .catch(error => { console.log(error); res.status(500).json({ error }) });
         //   .catch(error => res.status(500).json({ error }));
       };
 
@@ -89,19 +83,24 @@ exports.getOnePublication = (req, res, next) => {
         .catch(error => res.status(404).json({ error }));
 };
 
-//verifier si "sort" est bien placé :
-exports.getAllPublications = (req, res, next) => {
-    Publication.find()
-        .then(publications => res.status(200).json(publications)).sort({createdAt:-1})
-        .catch(error => res.status(400).json({ error }));
+//où placer la fonction de tri , du plus récent au moins recent:  (.sort({createdAt:-1}))
+// exports.getAllPublications = (req, res, next) => {
+//     Publication.find(docs, error)
+//         .then(publications => res.status(200).send(docs))
+//         .catch(error => res.status(400).json({ error }));    
+// };
 
-        
+exports.getAllPublications = (req, res) => {
+    Publication.find((err, docs)=>{
+        if(!err)res.send(docs);
+        else console.log ('Error to get data :'+err);
+    }) .sort({createdAt:-1})           
 };
 
 
 
 exports.likePublication = (req, res, next) => {
-    // On récupère la sauce dans la BDD - grâce à l'id de l'objet, passé dans l'url:    
+    // On récupère la publication dans la BDD - grâce à l'id de l'objet, passé dans l'url:    
     Publication.findOne({ _id: req.params.id })
         .then(publication => {
             //Il y a 2 cas possible : +1(like),  et 0(annulation de l'avis)            
@@ -139,35 +138,86 @@ exports.likePublication = (req, res, next) => {
 
 //gestion des commentaires
 
+//Creer un commentaire
+
 module.exports.commentPub =(req,res, next)=>{
-    Publication.findOne({ _id: req.params.id })
-    .then(publication => {
-        Publication.updateOne({ _id: req.params.id }, {            
-            $push: { comments: {
-                    commenterId: req.body.commenterId,
-                    text: req.body.text,
-                    timestamp: new Date().getTime()},
-        }
-        .then(() => res.status(201).json({ message: 'commentaire posté ! !' }))
-        .catch(error => res.status(400).json({ error }))
-    
-})})
-    .catch(error => res.status(500).json({ error }))
-}
+      // On récupère la publication dans la BDD - grâce à l'id de l'objet, passé dans l'url:       
+        Publication.updateOne({ _id: req.params.id },
+            {
+            // les changements à faire sur la bdd:            
+            $push: { 
+                comments:{
+                    commenterId:req.body.commenterId,
+                    // comenterName:req.body.commenterName,
+                    text:req.body.text,
+                    timestamp: new Date().getTime() }                 
+            }
+        } ) 
+         
+             .then(() => res.status(201).send({ message: 'Commentaire créé !' }))
+            .catch(error => res.status(400).json({ error }))
+      }
 
 
 
-// module.exports.editCommentPub =(req,res, next)=>{
+//Modifier un commentaire : ma methode : je ne vois pas pourquoi elle ne fonctione pas
+
+//  module.exports.editCommentPub =(req,res, next)=>{
+//      // On récupère la publication dans la BDD - grâce à l'id de l'objet, passé dans l'url: 
 //     Publication.findOne({ _id: req.params.id })
 //     .then(publication => {
-//         Publication.updateOne({ _id: req.params.id }, { 
+//         //on retrouve le commentaire recherché:
+//         // const theComment = publication.comments.find((comment)=>
+//         //     comment._id.equals(req.body.commentId) ) ;
+//         // //on modifie le texte du commentaire://        
+//         // theComment.text = req.body.text;
+//        )}
 
-    
+//     .catch(error => res.status(500).json({ error }))
 // }
 
-// module.exports.deleteCommentPub =(req,res, next)=>{
-//     Publication.findOne({ _id: req.params.id })
-//     .then(publication => {
-//         Publication.updateOne({ _id: req.params.id }, { 
-    
-// }
+
+//methode de From scratch
+
+
+module.exports.editCommentPub = (req, res) => {
+    // if (!ObjectID.isValid(req.params.id))
+    //   return res.status(400).send("ID unknown : " + req.params.id);  
+    try {
+      return Publication.findById(req.params.id, (err, docs) => {
+        const theComment = docs.comments.find((comment) =>
+          comment._id.equals(req.body.commentId)
+        );
+  
+        if (!theComment) return res.status(404).send("Comment not found");
+        theComment.text = req.body.text;
+  
+        return docs.save((err) => {
+          if (!err) return res.status(200).send(docs);
+          return res.status(500).send(err);
+        });
+      });
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  };
+
+
+
+  //supprimer commentaire
+
+
+  module.exports.deleteCommentPub =(req,res, next)=>{     
+        Publication.updateOne({ _id: req.params.id }, { 
+     // les changements à faire sur la bdd:            
+     $pull: { 
+        comments:{
+            _id: req.body.commentId,
+            }}
+          })                
+         .then(() => res.status(201).send({ message: 'Commentaire supprimé !' }))
+         .catch(error => res.status(400).json({ error }))
+   }
+
+
+//  

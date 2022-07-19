@@ -49,7 +49,7 @@ app.use(helmet());
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 //Routes utilisateur , publications et authentification
- app.use ('/api/publications', publicationRoutes);
+ app.use ('/api/publication', publicationRoutes);
  app.use('/api/auth', userRoutes);
  
 

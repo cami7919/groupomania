@@ -38,9 +38,15 @@ exports.signup = (req, res, next) => {
 
 //---------------ROUTE LOGIN : IDENTIFICATION UTILISATEUR --------------------------
 
-exports.login = (req, res, next) => {
-  console.log("afficher email du body de la req :"+req.body.email)
-  console.log("afficher mdp du body de la req :"+req.body.password)
+const createToken= (id)=>{
+  return jwt.sign(
+        { id },
+        process.env.RANDOM_TOKEN_SECRET,
+         { expiresIn: '72h' }
+)}
+//  const maxAge =50*24*60*60*1000;
+
+exports.login = (req, res, next) => {  
   //chiffrer l'email de la requete:
   const emailCryptoJs = cryptojs.HmacSHA256(req.body.email, process.env.CRYPTOJS_KEY_EMAIL).toString();
   //chercher dans la BDD si l'utilisateur est déjà présent:
@@ -59,25 +65,38 @@ exports.login = (req, res, next) => {
             return res.status(401).json({ message: 'Mot de passe incorrect !' });
           }
 
-          //récupérer l'id utilisateur, et le coder avec un token:
-          res.status(200).json({
-            userId: user._id,
-            token: jwt.sign(
-              { userId: user._id },
-              process.env.RANDOM_TOKEN_SECRET,
-               { expiresIn: '48h' }
-            )
-            
-          });
+     
+         //creer le token et l'enregistrer dans un cookie hhtp only
+
+          const token = createToken(user._id);
+          res.cookie('jwt', token, { httpOnly: true, maxAge:50*24*60*60*1000});
+          res.status(200).json({ user: user._id})
         })
-        .catch(error => res.status(500).json({ error }));
+   //s'ils correspondent : réponse 200 contenant l'id utilisateur et un token:
+          //la fonction sign() de jwt va chiffrer le nouveau token   
+          // res.status(200).json({
+          //   userId: user._id,
+          //   token: jwt.sign(
+          //     { userId: user._id },
+          //     process.env.RANDOM_TOKEN_SECRET,
+          //      { expiresIn: '48h' }
+            
+                  
+         
+        .catch(error => { console.log(error); res.status(500).json({ error }) });
+        // .catch(error => res.status(500).json({ error }));
     })
-    .catch(error => res.status(500).json({ error }));
+    // .catch(error => res.status(500).json({ error }));
+    .catch(error => { console.log(error); res.status(501).json({ error }) });
 };
+
+
+// exports.logout= (req, res, next) => {
+
 
 // --------------------------CRUD USER----------------------------------------
 
-module.exports.getAllUsers = (req, res, next) => {
+exports.getAllUsers = (req, res, next) => {
   User.find()
       .then(users => res.status(200).json(users))
       .catch(error => res.status(400).json({ error }));

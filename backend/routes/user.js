@@ -5,22 +5,22 @@ const userCtrl = require('../controllers/user');
 const password = require ('../middleware/password');
 const emailValidator = require ('../middleware/emailValidator');
 const uploadCtrl =require('../controllers/upload');
-const multer= require('multer');
+ const multer= require('multer');
 const upload = multer();
 
-//Authentification
+//Authentification :  /api/auth
 router.post('/signup', emailValidator, password,  userCtrl.signup);
 router.post ('/login', userCtrl.login);
 
 
-//crud des users
+//crud des users :/api/auth
 router.get('/', userCtrl.getAllUsers)
 router.get('/:id', userCtrl.getOneUser)
-router.put('/:id', auth, multer, userCtrl.modifyUser);
-router.delete('/:id', auth, multer, userCtrl.removeUser);
+// router.put('/:id',   userCtrl.modifyUser);
+// router.delete('/:id',   userCtrl.removeUser);
 
 //upload img
-router.post('/upload', upload.single('file'), umploadCtrl.uploadProfil);
+router.post('/upload', upload.single('file'), uploadCtrl.uploadProfil);
 
 
 module.exports = router;
