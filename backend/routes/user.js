@@ -11,6 +11,7 @@ const upload = multer();
 //Authentification :  /api/auth
 router.post('/signup', emailValidator, password,  userCtrl.signup);
 router.post ('/login', userCtrl.login);
+router.get ('/logout', userCtrl.logout);
 
 
 //crud des users :/api/auth

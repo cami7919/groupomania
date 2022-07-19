@@ -91,9 +91,10 @@ exports.login = (req, res, next) => {
 };
 
 
-// exports.logout= (req, res, next) => {
-
-
+exports.logout= (req, res, next) => {
+res.cookie('jwt','',{maxAge:1});
+res.redirect('/');
+}
 // --------------------------CRUD USER----------------------------------------
 
 exports.getAllUsers = (req, res, next) => {
