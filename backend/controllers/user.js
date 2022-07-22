@@ -44,7 +44,7 @@ const createToken= (id)=>{
         process.env.RANDOM_TOKEN_SECRET,
          { expiresIn: '72h' }
 )}
-//  const maxAge =50*24*60*60*1000;
+
 
 exports.login = (req, res, next) => {  
   //chiffrer l'email de la requete:
@@ -64,10 +64,8 @@ exports.login = (req, res, next) => {
           if (!valid) {
             return res.status(401).json({ message: 'Mot de passe incorrect !' });
           }
-
      
-         //creer le token et l'enregistrer dans un cookie hhtp only
-
+//s'ils correspondent :creer le token et l'enregistrer dans un cookie hhtp only
           const token = createToken(user._id);
           res.cookie('jwt', token, { httpOnly: true, maxAge:50*24*60*60*1000});
           res.status(200).json({ user: user._id})
@@ -80,14 +78,10 @@ exports.login = (req, res, next) => {
           //     { userId: user._id },
           //     process.env.RANDOM_TOKEN_SECRET,
           //      { expiresIn: '48h' }
-            
-                  
-         
-        .catch(error => { console.log(error); res.status(500).json({ error }) });
-        // .catch(error => res.status(500).json({ error }));
+                        
+         .catch(error => res.status(500).json({ error }));
     })
-    // .catch(error => res.status(500).json({ error }));
-    .catch(error => { console.log(error); res.status(501).json({ error }) });
+     .catch(error => res.status(500).json({ error }));    
 };
 
 

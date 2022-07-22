@@ -1,8 +1,9 @@
 const express = require('express');
-
+const cookieParser = require ('cookie-parser');
 const mongoose = require ('mongoose');
+const {checkUser, requireAuth}= require ('./middleware/auth');
 
-const publicationRoutes = require ('./routes/publication');
+// const publicationRoutes = require ('./routes/publication');
 const userRoutes = require ('./routes/user');
 
 const app = express(); 
@@ -13,6 +14,8 @@ const helmet = require('helmet');
 
 //Variables d'environnement, pour protéger la connexion à la BDD
 const dotenv = require('dotenv');
+const { readSync } = require('fs');
+const { formatWithOptions } = require('util');
 const result = dotenv.config();
 
 
@@ -31,16 +34,18 @@ mongoose.connect(
 
 //Eviter les erreurs de CORS
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Credentials','true');
     next();
   });
 
 
 //Pour pouvoir utiliser le body de la requete:
 app.use(express.json());
-
+//Pour pouvoir utiliser les cookies de la requete:
+app.use(cookieParser());
 
 //Protection en configurant les en-tetes HHTP renvoyés par Express
 app.use(helmet());
@@ -48,8 +53,17 @@ app.use(helmet());
 // Pour acceder aux images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
+//jwt
+app.get ('*', checkUser);
+// cette fonction sera utilisée une fois en front avec react, 
+// qd l'utilisateur arrive sur l'appli, on teste si on connait son token et on le connecte automatiquement. C'est comme ça qu'il n'a pas toujours à se connecter qd il arrive sur le site
+app.get('/jwtid', requireAuth, (req, res)=>{
+  res.status(200).send(res.locals.user._id)
+})
+
+
 //Routes utilisateur , publications et authentification
- app.use ('/api/publication', publicationRoutes);
+//  app.use ('/api/publication', publicationRoutes);
  app.use('/api/auth', userRoutes);
  
 
