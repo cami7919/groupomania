@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require ('cookie-parser');
 const mongoose = require ('mongoose');
 const {checkUser, requireAuth}= require ('./middleware/auth');
+// const cors = require ('cors')
 
 // const publicationRoutes = require ('./routes/publication');
 const userRoutes = require ('./routes/user');
@@ -34,13 +35,15 @@ mongoose.connect(
 
 //Eviter les erreurs de CORS
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization, sessionId');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     res.setHeader('Access-Control-Allow-Credentials','true');
     next();
   });
 
+
+  // app.use(cors)
 
 //Pour pouvoir utiliser le body de la requete:
 app.use(express.json());
@@ -55,11 +58,11 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 //jwt
 app.get ('*', checkUser);
-// cette fonction sera utilisée une fois en front avec react, 
-// qd l'utilisateur arrive sur l'appli, on teste si on connait son token et on le connecte automatiquement. C'est comme ça qu'il n'a pas toujours à se connecter qd il arrive sur le site
+// cette fonction ci dessous sera utilisée une fois en front avec react, 
+// qd l'utilisateur arrive sur l'appli, on teste si on connait son token et on le connecte automatiquement.(grace au hokk useConext en front)
 app.get('/jwtid', requireAuth, (req, res)=>{
   res.status(200).send(res.locals.user._id)
-})
+});
 
 
 //Routes utilisateur , publications et authentification

@@ -9,6 +9,8 @@ require('dotenv').config();
 //3. Verifier que l'userId de la requete existe
 //4. comparer l'userId de la requete avec l'userId  du token :
 
+
+//pour tester si l'utilisateur est bien connecté à tout moment:
 module.exports.checkUser = (req, res, next) => {
     const token = req.cookies.jwt;
     if (token) {
@@ -20,20 +22,16 @@ module.exports.checkUser = (req, res, next) => {
           next();
         } else {
             //si la clé permet de dechiffrer le token, on retrouve le user correspondant:
-            let user = await User.findOne({
-                where: {
-                  id: decodedToken.id,
-                },
+            let user = await User.findById(decodedToken.id);
+            res.locals.user = user;           
+            next();
+          }
             });
-          res.locals.user = user;
-          next();
-        }
-      });
-    } else {
-      res.locals.user = null;
-      next();
-    }
-  };
+          } else {
+            res.locals.user = null;
+            next();
+          }
+        };
 
 // module.exports.checkUser = (req, res, next) =>{
 //     try{
@@ -54,7 +52,7 @@ module.exports.checkUser = (req, res, next) => {
 //         }}
 
 
-// POUR LA PREMIERE AUTHENTIFICATION DE L UTILISATEUR : 
+// POUR LA PREMIERE AUTHENTIFICATION DE L UTILISATEUR en front : 
 // controler que le token correspond à qqun deja présent dans la BDD
 module.exports.requireAuth = (req, res, next) =>{
 const token = req.cookies.jwt;
@@ -65,6 +63,7 @@ if(token){
             res.send(200).json('No token')
         }else{
             console.log(decodedToken.id);
+            // res.status(200).send(res.locals.user._id)
             next();
         }
     })
