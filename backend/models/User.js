@@ -4,6 +4,8 @@ const {isEmail}= require ('validator');
 const uniqueValidator = require('mongoose-unique-validator');
 
 const userSchema = mongoose.Schema({
+    pseudo:{type:String, required : true, minLength: 3, maxLength: 35, unique: true,
+        trim: true},
     email: {type: String, required : true, unique : true},
     password: {type: String, required : true}
 });

@@ -18,7 +18,7 @@ module.exports.checkUser = (req, res, next) => {
         if (err) {
           res.locals.user = null;
           res.status(500).json("utilisateur non connecté")
-          res.cookie("jwt", "", { maxAge: 1 });//pour supprimer le token s'il est faux
+          // res.cookie("jwt", "", { maxAge: 1 });//pour supprimer le token s'il est faux
           next();
         } else {
             //si la clé permet de dechiffrer le token, on retrouve le user correspondant:
