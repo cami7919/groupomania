@@ -1,16 +1,16 @@
 const router = require('express').Router();
 
 const publicationCtrl = require ('../controllers/publication');
-const auth = require('../middleware/auth');
+// const auth = require('../middleware/auth');
 const multer = require ('../middleware/multer-config');
 
 //routes des publications : /api/publication
-router.post('/', auth,  multer, publicationCtrl.createPublication);          
-router.put('/:id', auth, multer, publicationCtrl.modifyPublication);
-router.delete('/:id', auth, multer, publicationCtrl.removePublication);
-router.get('/:id', auth, publicationCtrl.getOnePublication);
-router.get('/', auth, publicationCtrl.getAllPublications);
-router.post("/:id/like", auth, publicationCtrl.likePublication);
+ router.post('/',   multer, publicationCtrl.createPublication);          
+router.put('/:id',  multer, publicationCtrl.modifyPublication);
+router.delete('/:id', multer, publicationCtrl.removePublication);
+router.get('/:id',  publicationCtrl.getOnePublication);
+router.get('/',  publicationCtrl.getAllPublications);
+router.post("/:id/like",  publicationCtrl.likePublication);
 
 // commentaires
  router.patch('/comment-pub/:id', publicationCtrl.commentPub);

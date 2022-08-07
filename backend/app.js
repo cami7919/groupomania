@@ -4,7 +4,7 @@ const mongoose = require ('mongoose');
 const {checkUser, requireAuth}= require ('./middleware/auth');
 // const cors = require ('cors')
 
-// const publicationRoutes = require ('./routes/publication');
+ const publicationRoutes = require ('./routes/publication');
 const userRoutes = require ('./routes/user');
 
 const app = express(); 
@@ -66,7 +66,7 @@ app.get('/jwtid', requireAuth, (req, res)=>{
 
 
 //Routes utilisateur , publications et authentification
-//  app.use ('/api/publication', publicationRoutes);
+ app.use ('/api/publication', publicationRoutes);
  app.use('/api/auth', userRoutes);
  
 
