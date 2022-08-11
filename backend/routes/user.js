@@ -18,7 +18,7 @@ router.get ('/logout', userCtrl.logout);
 router.get('/', userCtrl.getAllUsers)
 router.get('/:id', userCtrl.getOneUser)
 // router.put('/:id',   userCtrl.modifyUser);
-// router.delete('/:id',   userCtrl.removeUser);
+ router.delete('/:id',   userCtrl.removeUser);
 
 //upload img
 router.post('/upload', upload.single('file'), uploadCtrl.uploadProfil);
