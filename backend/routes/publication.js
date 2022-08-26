@@ -12,7 +12,7 @@ router.get("/:id", publicationCtrl.getOnePublication);
 router.get("/", publicationCtrl.getAllPublications);
 router.patch("/:id/like", publicationCtrl.likePublication);
 
-// commentaires
+// commentaires : /api/publication
 router.patch("/comment-pub/:id", publicationCtrl.commentPub);
 router.patch("/edit-comment-pub/:id", publicationCtrl.editCommentPub);
 router.patch("/delete-comment-pub/:id", publicationCtrl.deleteCommentPub);
