@@ -11,6 +11,7 @@ router.delete("/:id", multer, publicationCtrl.removePublication);
 router.get("/:id", publicationCtrl.getOnePublication);
 router.get("/", publicationCtrl.getAllPublications);
 router.patch("/:id/like", publicationCtrl.likePublication);
+router.patch("/:id/unlike", publicationCtrl.unlikePublication);
 
 // commentaires : /api/publication
 router.patch("/comment-pub/:id", publicationCtrl.commentPub);

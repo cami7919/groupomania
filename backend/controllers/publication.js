@@ -109,37 +109,15 @@ exports.likePublication = (req, res, next) => {
   // On récupère la publication dans la BDD - grâce à l'id de l'objet, passé dans l'url:
   Publication.findOne({ _id: req.params.id })
     .then((publication) => {
-      //Il y a 2 cas possible : +1(like),  et 0(annulation de l'avis)
-      switch (req.body.like) {
-        //Si l'utilisateur like  :
-        case 1:
-          Publication.updateOne(
-            { _id: req.params.id },
-            {
-              $inc: { likes: 1 },
-              $push: { usersLiked: req.body.userId },
-            }
-          )
-            .then(() => res.status(201).json({ message: "Like appliqué !" }))
-            .catch((error) => res.status(400).json({ error }));
-          break;
-        default:
-          return res.status(500).json({ error });
-
-        //Si la publication est déjà likée : on retire le like
-        case 0:
-          if (publication.usersLiked.find((user) => user === req.body.userId)) {
-            Publication.updateOne(
-              { _id: req.params.id },
-              {
-                $inc: { likes: -1 },
-                $pull: { usersLiked: req.body.userId },
-              }
-            )
-              .then(() => res.status(201).json({ message: " Like annulé !" }))
-              .catch((error) => res.status(400).json({ error }));
-          }
-      }
+      Publication.updateOne(
+        { _id: req.params.id },
+        {
+          $inc: { likes: 1 },
+          $push: { usersLiked: req.body.userId },
+        }
+      )
+        .then(() => res.status(201).json({ message: "Like appliqué !" }))
+        .catch((error) => res.status(400).json({ error })); //
     })
     .catch((error) => res.status(500).json({ error }));
 };
@@ -148,34 +126,16 @@ exports.unlikePublication = (req, res, next) => {
   // On récupère la publication dans la BDD - grâce à l'id de l'objet, passé dans l'url:
   Publication.findOne({ _id: req.params.id })
     .then((publication) => {
-      //Il y a 2 cas possible : +1(like),  et 0(annulation de l'avis)
-      switch (req.body.like) {
-        //Si l'utilisateur like  :JE RETIRE CE CAS CI
-        // case 1:
-        //     Publication.updateOne({ _id: req.params.id }, {
-        //         $inc: { likes: 1 },
-        //         $push: { usersLiked: req.body.userId },
-
-        //     })
-        //         .then(() => res.status(201).json({ message: 'Like appliqué !' }))
-        //         .catch(error => res.status(400).json({ error }));
-        //     break;
-        // default:
-        //     return res.status(500).json({ error });
-
-        //Si la publication est déjà likée : on retire le like
-        case 0:
-          if (publication.usersLiked.find((user) => user === req.body.userId)) {
-            Publication.updateOne(
-              { _id: req.params.id },
-              {
-                $inc: { likes: -1 },
-                $pull: { usersLiked: req.body.userId },
-              }
-            )
-              .then(() => res.status(201).json({ message: " Like annulé !" }))
-              .catch((error) => res.status(400).json({ error }));
+      if (publication.usersLiked.find((user) => user === req.body.userId)) {
+        Publication.updateOne(
+          { _id: req.params.id },
+          {
+            $inc: { likes: -1 },
+            $pull: { usersLiked: req.body.userId },
           }
+        )
+          .then(() => res.status(201).json({ message: " Like annulé !" }))
+          .catch((error) => res.status(400).json({ error }));
       }
     })
     .catch((error) => res.status(500).json({ error }));
